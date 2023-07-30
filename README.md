@@ -1,57 +1,91 @@
-# Your Project Name
+# Titanic
 
 ## Introduction
 
-This is a Makefile for building and running components of your project. The Makefile commands allow you to build the API
-server, create Docker images for the API, CSV store, and SQLite store, run the components as Docker containers, and
-generate API documentation.
+---
+Titanic API exposes several endpoints over titanic dataset, enabling querying passengers and passengers aggregated data.
 
 ## Prerequisites
 
+---
 Before using the Makefile commands, make sure you have the following tools and dependencies installed:
 
 - Go: Make sure you have Go installed to build the API server and run tests.
 - Docker: Install Docker to build and run Docker images.
-- Docker Compose (optional): If you plan to use Docker Compose for managing multiple containers, install Docker Compose.
+- Docker Compose (optional): If you plan to use Docker Compose to deploy the application.
+- Kubernetes Cluster: If you plan to use Kubernetes and helm or kubectl to deploy the application
 
 ## Environment Variables
 
-The Makefile uses the `.env` file to set environment variables. Make sure to include the required environment variables
-in the `.env` file to customize the behavior of the Makefile commands.
+---
+The application uses environment variables located in `.env`. Make sure to set the environment variables if you are not using the Makefile.
+If you are using the Makefile environment variables will be loaded from `.env`.
 
+## OpenAPI Docs
+
+---
+Once you run the API you can access the OpenAPI UI in `/api/docs/` or `/api/docs/index.html`
+
+#### Notice the default host and ports are http://localhost:8089
+
+## Store
+
+---
+### CSV store
+Dataset used in the API is the Titanic CSV data under folder `/data/csv/titanic.csv`
+### SQLite store
+Dataset is a copy of `/data/csv/titanic.csv` data located in `/data/sqlite/titanic.db`
+created with the following in sqlite terminal:
+
+```
+CREATE TABLE passengers (
+PassengerId INTEGER PRIMARY KEY,
+Survived INTEGER,
+Pclass INTEGER,
+Name TEXT,
+Sex TEXT,
+Age REAL,
+SibSp INTEGER,
+Parch INTEGER,
+Ticket TEXT,
+Fare REAL,
+Cabin TEXT,
+Embarked TEXT
+);
+```
+and then 
+```
+.import /Users/elibr/GolandProjects/titanic-api/testdata/titanic.csv passengers
+
+```
+
+#### NOTICE: If you want to check both implemetation you can set the store type in config.yaml to `SQLITE/CSV`.
 ## Makefile Commands
 
+---
 ### `make run`
 
-Precentiles the API server in normal mode using `go run`.
+Run the API server in standalone mode using `go run`.
 
 ### `make build`
 
-Build the API server binary.
+Build the API server binary using `go build`.
 
 ### `make docker-build`
 
 Build the API server as a Docker image.
 
-### `make docker-build-csv-store`
+### `make docker-build-store`
 
-Build the CSV store as a Docker image.
-
-### `make docker-build-sqlite-store`
-
-Build the SQLite store as a Docker image.
+Build the data store as a Docker image.
 
 ### `make docker-run`
 
-Precentiles the API server as a Docker container.
+Run the API server as a Docker container.
 
-### `make docker-run-csv-store`
+### `make docker-run-store`
 
-Precentiles the CSV store as a Docker container.
-
-### `make docker-run-sqlite-store`
-
-Precentiles the SQLite store as a Docker container.
+Run the data store as a Docker container.
 
 ### `make docker-start`
 
@@ -65,13 +99,29 @@ Stop the Docker API container.
 
 Remove the Docker images and containers.
 
-### `make docker-compose-up`
+### `make docker-compose-start`
 
-Build Docker images for API, CSV store, and SQLite store, and run them using Docker Compose.
+Build Docker images for API & store and deploy using Docker Compose.
 
-### `make docker-compose-stop`
+### `make docker-compose-remove`
 
 Stop the Docker Compose services.
+
+### `make k8s-deploy`
+
+Deploy Kubernetes resources.
+
+### `make k8s-remove`
+
+Remove Kubernetes resources.
+
+### `make helm-deploy`
+
+Deploy Kubernetes resources using helm.
+
+### `make helm-remove`
+
+Remove Kubernetes resources using helm.
 
 ### `make api-docs`
 
@@ -88,11 +138,3 @@ Measure code coverage for the tests.
 ### `make coverage-html`
 
 Generate an HTML report of the code coverage.
-
----
-
-Please note that the `.env` file is used to set environment variables for the Docker image builds and runs. Make sure to
-customize the Makefile and `.env` file according to your project's specific requirements.
-
-Remember to replace `Your Project Name` with the actual name of your project. This README file provides an overview of
-the available Makefile commands to help users build, run, and manage the components of your project.
