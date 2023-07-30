@@ -27,7 +27,7 @@ If you are using the Makefile environment variables will be loaded from `.env`.
 
 Project structure follows unofficial standard however simple one for API layout - https://github.com/golang-standards/project-layout
 
-#### project uses vendor folder while build the binary to not download dependencies in runtime
+#### project uses vendor folder while building the binary to not download dependencies in runtime
 ## OpenAPI Docs
 
 ---
