@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"titanic-api/pkgs/response"
+	"titanic-api/pkg/response"
 )
 
 const (

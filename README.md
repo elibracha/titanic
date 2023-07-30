@@ -21,6 +21,13 @@ Before using the Makefile commands, make sure you have the following tools and d
 The application uses environment variables located in `.env`. Make sure to set the environment variables if you are not using the Makefile.
 If you are using the Makefile environment variables will be loaded from `.env`.
 
+## Folder Structure
+
+---
+
+Project structure follows unofficial standard however simple one for api layout - https://github.com/golang-standards/project-layout
+
+#### project uses vendor folder in build the binary to not download dependencies in runtime
 ## OpenAPI Docs
 
 ---

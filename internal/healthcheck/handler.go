@@ -3,7 +3,7 @@ package healthcheck
 import (
 	"github.com/go-chi/chi"
 	"net/http"
-	"titanic-api/pkgs/response"
+	"titanic-api/pkg/response"
 )
 
 type HealthHandler struct{}

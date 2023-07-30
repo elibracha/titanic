@@ -1,7 +1,7 @@
 package passenger
 
 import (
-	"titanic-api/pkgs/histogram"
+	"titanic-api/pkg/histogram"
 )
 
 type Service interface {
