@@ -62,7 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/passenger/fare/histogram/histogram": {
+        "/passenger/fare/histogram/percentile": {
             "get": {
                 "description": "Get histogram represention of number of passengers in each precentile",
                 "produces": [
@@ -122,6 +122,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/passenger.Response"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
@@ -130,6 +136,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "errors.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "histogram.Entry": {
             "type": "object",
             "properties": {

@@ -10,7 +10,6 @@ DOCKER_STORE_IMAGE_NAME := "$(PROJECT_NAME)-store:v1"
 run: api-docs
 	CSV_STORE_PATH=${CSV_STORE_PATH} \
 	SQLITE_STORE_PATH=${SQLITE_STORE_PATH} \
-	STORE_TYPE=${STORE_TYPE} \
 	API_PORT=${API_PORT} \
 	go run -mod=vendor ./cmd/api/main.go
 
@@ -24,8 +23,7 @@ docker-build:
 	docker build -t ${DOCKER_API_IMAGE_NAME} . \
 		--build-arg port=${API_PORT} \
 		--build-arg csv_path=${CSV_STORE_PATH} \
-		--build-arg sqlite_path=${SQLITE_STORE_PATH} \
-		--build-arg store_type=${STORE_TYPE}
+		--build-arg sqlite_path=${SQLITE_STORE_PATH}
 
 ## docker-build-store: Build the data store as a docker image
 docker-build-store:
@@ -58,7 +56,6 @@ docker-remove: docker-stop
 docker-compose-start: docker-build docker-build-store
 	STORE_IMAGE_NAME=${DOCKER_STORE_IMAGE_NAME} \
     API_IMAGE_NAME=${DOCKER_API_IMAGE_NAME} \
-    STORE_TYPE=${STORE_TYPE} \
     API_PORT=${API_PORT} \
     docker-compose up -d
 
@@ -66,7 +63,6 @@ docker-compose-start: docker-build docker-build-store
 docker-compose-remove:
 	STORE_IMAGE_NAME=${DOCKER_STORE_IMAGE_NAME} \
     API_IMAGE_NAME=${DOCKER_API_IMAGE_NAME} \
-    STORE_TYPE=${STORE_TYPE} \
     API_PORT=${API_PORT} \
 	docker-compose down
 

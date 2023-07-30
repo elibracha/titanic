@@ -2,19 +2,20 @@ package config
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
+	"log"
 	"os"
 	"strconv"
-	"titanic-api/internal/passenger"
 )
 
 type Config struct {
-	storeType       passenger.StoreType
+	storeType       string
 	storePathCSV    string
 	storePathSQLite string
 	port            int
 }
 
-func (c *Config) GetStoreType() passenger.StoreType {
+func (c *Config) GetStoreType() string {
 	return c.storeType
 }
 
@@ -38,36 +39,41 @@ func getEnv(key string) (string, error) {
 	return value, nil
 }
 
-func NewConfig() (*Config, error) {
+func NewConfig() *Config {
 	var config Config
-
-	storeType, err := getEnv("STORE_TYPE")
-	if err != nil {
-		return nil, err
-	}
-
 	portStr, err := getEnv("API_PORT")
 	if err != nil {
-		return nil, err
+		log.Fatal("environment variable not set API_PORT")
 	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		return nil, fmt.Errorf("invalid port number provided in API_PORT")
+		log.Fatal("invalid port number provided in API_PORT")
 	}
 
 	storePathCSV, err := getEnv("CSV_STORE_PATH")
 	if err != nil {
-		return nil, err
+		log.Fatal("environment variable not set CSV_STORE_PATH")
 	}
 	storePathSqlite, err := getEnv("SQLITE_STORE_PATH")
 	if err != nil {
-		return nil, err
+		log.Fatal("environment variable not set SQLITE_STORE_PATH")
 	}
 
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf("failed to read config file: %s", viper.ConfigFileUsed())
+	}
+
+	storeType := viper.GetString("api.store.type")
+
 	config.port = port
-	config.storeType = passenger.StoreType(storeType)
+	config.storeType = storeType
 	config.storePathCSV = storePathCSV
 	config.storePathSQLite = storePathSqlite
 
-	return &config, nil
+	return &config
 }

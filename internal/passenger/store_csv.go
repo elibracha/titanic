@@ -22,7 +22,7 @@ func (s *csvStore) GetPassenger(pid int) (*Passenger, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("passenger not found")
+	return nil, ErrPassengerNotFound
 }
 
 func (s *csvStore) GetPassengers() ([]*Passenger, error) {

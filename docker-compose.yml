@@ -29,7 +29,6 @@ services:
       CSV_STORE_PATH: "/data/csv/titanic.csv"
       SQLITE_STORE_PATH: "/data/sqlite/titanic.db"
       API_PORT: ${API_PORT}
-      STORE_TYPE: ${STORE_TYPE}
     ports:
       - "${API_PORT}:${API_PORT}"
 

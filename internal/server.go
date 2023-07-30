@@ -29,7 +29,7 @@ type server struct {
 func (s *server) Start() {
 	router, err := s.router()
 	if err != nil {
-		log.Fatalf("router setup error: %s", err)
+		log.Fatalf("setup error: %s", err)
 	}
 
 	port := fmt.Sprintf(":%d", s.conf.GetPort())
@@ -111,7 +111,7 @@ func (s *server) router() (*chi.Mux, error) {
 func (s *server) initService() (passenger.Service, error) {
 	var store passenger.Store
 	storeType := s.conf.GetStoreType()
-	switch storeType {
+	switch passenger.StoreType(storeType) {
 	case passenger.CSV:
 		store = passenger.NewStoreCSV(s.conf.GetStorePathCSV())
 	case passenger.SQLITE:
@@ -124,10 +124,6 @@ func (s *server) initService() (passenger.Service, error) {
 
 }
 
-func NewServer() (Server, error) {
-	conf, err := config.NewConfig()
-	if err != nil {
-		return nil, err
-	}
-	return &server{conf: conf}, nil
+func NewServer() Server {
+	return &server{conf: config.NewConfig()}
 }

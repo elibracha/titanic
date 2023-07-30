@@ -4,15 +4,21 @@ import (
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/render"
 	"log"
 	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
+	"titanic-api/pkgs/errors"
 )
 
-const maxAttributeParamLength = 256
+const (
+	maxAttributeParamLength = 256
+)
+
+var (
+	ErrInvalidID = fmt.Errorf("id provided is not a valid integer")
+)
 
 type Response struct {
 	PassengerId int     `json:"id"`
@@ -37,77 +43,8 @@ func (h *Handler) RegisterHandler() *chi.Mux {
 	router := chi.NewRouter()
 	router.Get("/", h.GetAll)
 	router.Get("/{id}", h.Get)
-	router.Get("/fare/histogram/histogram", h.FarePercentiles)
+	router.Get("/fare/histogram/percentile", h.FarePercentiles)
 	return router
-}
-
-// Package 	godoc
-// @Summary Get fare histogram histogram
-// @Description Get histogram represention of number of passengers in each precentile
-// @Tags    passenger
-// @ID 		passenger-fare-histogram
-// @Produce json
-// @Success 200 {object} histogram.Histogram
-// @Failure 500
-// @Router  /passenger/fare/histogram/histogram [get]
-func (h *Handler) FarePercentiles(w http.ResponseWriter, r *http.Request) {
-	histogram, err := h.service.FarePercentileHistogram()
-	switch err {
-	case nil:
-		w.WriteHeader(http.StatusOK)
-		render.JSON(w, r, histogram)
-	default:
-		log.Println(fmt.Sprintf("request id: %s failed to get fare histogram histogram: %v",
-			middleware.GetReqID(r.Context()), err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		render.NoContent(w, r)
-	}
-}
-
-// Package 	godoc
-// @Summary Get passenger
-// @Description Get passenger by ID number
-// @Tags    passenger
-// @ID 		passenger-get
-// @Produce json
-// @Param id path int true "Passenger ID"
-// @Param attributes query []string false "Allowed: id, age, sex, name, survived, class, siblings-spouses, parents-children, ticket, fare, cabin, embarked"
-// @Success 200 {object} Response
-// @Failure 500
-// @Router  /passenger/{id} [get]
-func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
-	attr := r.URL.Query().Get("attributes")
-	if err := h.validateAttributes(attr); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		render.NoContent(w, r)
-		return
-	}
-
-	pid, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		render.NoContent(w, r)
-		return
-	}
-
-	storePassenger, err := h.service.Get(pid)
-	if err != nil {
-		log.Println(fmt.Sprintf("request id: %s failed to get passenger: %v",
-			middleware.GetReqID(r.Context()), err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		render.NoContent(w, r)
-		return
-	}
-
-	p := h.convertPassenger(storePassenger)
-	switch len(attr) {
-	case 0:
-		render.JSON(w, r, p)
-	default:
-		render.JSON(w, r, h.filterAttributes(p, attr))
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // Package 	godoc
@@ -127,21 +64,87 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 		for _, p := range passengers {
 			rs = append(rs, h.convertPassenger(p))
 		}
-		w.WriteHeader(http.StatusOK)
-		render.JSON(w, r, rs)
+		errors.SendBody(r, w, http.StatusOK, rs)
 	default:
 		log.Println(fmt.Sprintf("request id: %s failed to get passengers: %v",
 			middleware.GetReqID(r.Context()), err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		render.NoContent(w, r)
+		errors.SendError(r, w, http.StatusInternalServerError, errors.ErrInternalFailure.Error())
+	}
+}
+
+// Package 	godoc
+// @Summary Get passenger
+// @Description Get passenger by ID number
+// @Tags    passenger
+// @ID 		passenger-get
+// @Produce json
+// @Param id path int true "Passenger ID"
+// @Param attributes query []string false "Allowed: id, age, sex, name, survived, class, siblings-spouses, parents-children, ticket, fare, cabin, embarked"
+// @Success 200 {object} Response
+// @Failure 404 {object} errors.Error
+// @Failure 500
+// @Router  /passenger/{id} [get]
+func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
+	attr := r.URL.Query().Get("attributes")
+	if err := h.validateAttributes(attr); err != nil {
+		errors.SendError(r, w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	pid, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		errors.SendError(r, w, http.StatusBadRequest, ErrInvalidID.Error())
+		return
+	}
+
+	storePassenger, err := h.service.Get(pid)
+	switch {
+	case err == ErrPassengerNotFound:
+		errors.SendError(r, w, http.StatusNotFound, ErrPassengerNotFound.Error())
+		return
+	case err != nil:
+		log.Println(fmt.Sprintf("request id: %s failed to get passenger: %v",
+			middleware.GetReqID(r.Context()), err.Error()))
+		errors.SendError(r, w, http.StatusInternalServerError, errors.ErrInternalFailure.Error())
+		return
+	}
+
+	p := h.convertPassenger(storePassenger)
+	switch len(attr) {
+	case 0:
+		errors.SendBody(r, w, http.StatusOK, p)
+	default:
+		errors.SendBody(r, w, http.StatusOK, h.filterAttributes(p, attr))
+	}
+}
+
+// Package 	godoc
+// @Summary Get fare histogram histogram
+// @Description Get histogram represention of number of passengers in each precentile
+// @Tags    passenger
+// @ID 		passenger-fare-histogram
+// @Produce json
+// @Success 200 {object} histogram.Histogram
+// @Failure 500
+// @Router  /passenger/fare/histogram/percentile [get]
+func (h *Handler) FarePercentiles(w http.ResponseWriter, r *http.Request) {
+	histogram, err := h.service.FarePercentileHistogram()
+	switch err {
+	case nil:
+		errors.SendBody(r, w, http.StatusOK, histogram)
+	default:
+		log.Println(fmt.Sprintf("request id: %s failed to get fare histogram histogram: %v",
+			middleware.GetReqID(r.Context()), err.Error()))
+		errors.SendError(r, w, http.StatusInternalServerError, errors.ErrInternalFailure.Error())
 	}
 }
 
 func (h *Handler) validateAttributes(attr string) error {
-	attributes := strings.Split(attr, ",")
-	if len(attributes) == 0 {
+	if len(attr) == 0 {
 		return nil
 	}
+
+	attributes := strings.Split(attr, ",")
 	if len(attributes) > maxAttributeParamLength {
 		return fmt.Errorf("attributes query parameter is too long max length %d", maxAttributeParamLength)
 	}
@@ -153,7 +156,7 @@ func (h *Handler) validateAttributes(attr string) error {
 	passengerValue := reflect.ValueOf(&Response{}).Elem()
 	passengerType := passengerValue.Type()
 
-	for _, attr := range attributes {
+	for _, attribute := range attributes {
 		var valid bool
 		for i := 0; i < passengerValue.NumField(); i++ {
 			if valid {
@@ -163,14 +166,14 @@ func (h *Handler) validateAttributes(attr string) error {
 
 			jsonField := fieldType.Tag.Get("json")
 			switch jsonField {
-			case attr:
+			case attribute:
 				valid = true
 			default:
 				valid = false
 			}
 		}
 		if !valid {
-			return fmt.Errorf("unknown attribute filter provided %s", attr)
+			return fmt.Errorf("unknown attribute filter provided '%s'", attribute)
 		}
 	}
 	return nil

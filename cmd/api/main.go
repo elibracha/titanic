@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"titanic-api/internal"
 )
 
@@ -11,9 +10,5 @@ import (
 // @contact.name    Eli Bracha
 // @BasePath       /api/v1
 func main() {
-	server, err := internal.NewServer()
-	if err != nil {
-		log.Fatal(err)
-	}
-	server.Start()
+	internal.NewServer().Start()
 }

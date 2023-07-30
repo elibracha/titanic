@@ -1,8 +1,14 @@
 package passenger
 
+import "fmt"
+
 const (
 	CSV    StoreType = "CSV"
 	SQLITE StoreType = "SQLITE"
+)
+
+var (
+	ErrPassengerNotFound = fmt.Errorf("passenger not found")
 )
 
 type StoreType string

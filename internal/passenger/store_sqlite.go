@@ -18,7 +18,7 @@ func (s *sqliteStore) GetPassenger(pid int) (*Passenger, error) {
 	var passenger Passenger
 	if err = db.Where("PassengerId = ?", pid).First(&passenger).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("passenger not found")
+			return nil, ErrPassengerNotFound
 		}
 		return nil, err
 	}

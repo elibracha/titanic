@@ -6,5 +6,4 @@ metadata:
 data:
   CSV_STORE_PATH: "/data-store/csv/titanic.csv"
   SQLITE_STORE_PATH: "/data-store/sqlite/titanic.db"
-  STORE_TYPE: "CSV"
   API_PORT: "8089"

@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  errors.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
   histogram.Entry:
     properties:
       bin:
@@ -102,12 +109,16 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/passenger.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
         "500":
           description: Internal Server Error
       summary: Get passenger
       tags:
       - passenger
-  /passenger/fare/histogram/histogram:
+  /passenger/fare/histogram/percentile:
     get:
       description: Get histogram represention of number of passengers in each precentile
       operationId: passenger-fare-histogram
