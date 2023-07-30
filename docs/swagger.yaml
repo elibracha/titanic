@@ -106,7 +106,8 @@ paths:
         name: id
         required: true
         type: integer
-      - description: 'Allowed: id, age, sex, name, survived, class, siblings-spouses,
+      - collectionFormat: csv
+        description: 'Allowed: id, age, sex, name, survived, class, siblings-spouses,
           parents-children, ticket, fare, cabin, embarked'
         in: query
         items:

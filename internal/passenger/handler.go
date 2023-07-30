@@ -156,6 +156,7 @@ func (h *Handler) validateAttributes(attr string) error {
 	passengerValue := reflect.ValueOf(&Response{}).Elem()
 	passengerType := passengerValue.Type()
 
+	visited := make(map[string]bool)
 	for _, attribute := range attributes {
 		var valid bool
 		for i := 0; i < passengerValue.NumField(); i++ {
@@ -167,13 +168,17 @@ func (h *Handler) validateAttributes(attr string) error {
 			jsonField := fieldType.Tag.Get("json")
 			switch jsonField {
 			case attribute:
+				if _, found := visited[attribute]; found {
+					return fmt.Errorf("attribute '%s' provided multiple times in query", attribute)
+				}
+				visited[attribute] = true
 				valid = true
 			default:
 				valid = false
 			}
 		}
 		if !valid {
-			return fmt.Errorf("unknown attribute filter provided '%s'", attribute)
+			return fmt.Errorf("unknown attribute filter provided '%s' in query", attribute)
 		}
 	}
 	return nil

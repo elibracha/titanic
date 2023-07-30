@@ -14,13 +14,13 @@ run: api-docs
 	go run -mod=vendor ./cmd/api/main.go
 
 ## build: Build the API server binary
-build:
-	CGO_ENABLED=0 go build -mod=vendor ${LDFLAGS} -o ${PROJECT_NAME} ./cmd/api/main.go
+build: api-docs
+	CGO_ENABLED=1 go build -mod=vendor -o ${PROJECT_NAME} ./cmd/api/main.go
 
 ## docker-build: Build the API server as a docker image
 docker-build:
 	$(info ---> Building Docker Image: ${DOCKER_API_IMAGE_NAME})
-	docker build -t ${DOCKER_API_IMAGE_NAME} . \
+	docker build --progress=plain -t ${DOCKER_API_IMAGE_NAME} . \
 		--build-arg port=${API_PORT} \
 		--build-arg csv_path=${CSV_STORE_PATH} \
 		--build-arg sqlite_path=${SQLITE_STORE_PATH}
@@ -66,6 +66,7 @@ docker-compose-remove:
     API_PORT=${API_PORT} \
 	docker-compose down
 
+## k8s-deploy: deploy kubernetes resources
 k8s-deploy: docker-build docker-build-store
 	$(info ---> Deploying Kubernetes Deployment...)
 	-kubectl create namespace ${KUBERNETES_NAMESPACE}
@@ -73,6 +74,8 @@ k8s-deploy: docker-build docker-build-store
 	kubectl apply -f deploy/k8s/deployment.yml
 	kubectl apply -f deploy/k8s/service.yml
 
+
+## docker-compose-remove: remove kubernetes resources
 k8s-remove:
 	$(info ---> Deleting Kubernetes Deployment...)
 	-kubectl delete -f deploy/k8s/deployment.yml
@@ -80,11 +83,13 @@ k8s-remove:
 	-kubectl delete -f deploy/k8s/configmap.yml
 	-kubectl delete namespace ${KUBERNETES_NAMESPACE}
 
+## helm-deploy: deploy kubernetes resources using helm release
 helm-deploy: docker-build docker-build-store
 	$(info ---> Deploying Helm Chart Release...)
 	-kubectl create namespace ${KUBERNETES_NAMESPACE}
 	helm install $(PROJECT_NAME) deploy/helm/ --namespace ${KUBERNETES_NAMESPACE}
 
+## helm-remove: remove kubernetes resources using helm release
 helm-remove:
 	$(info ---> Deleting Helm Chart Release...)
 	-helm uninstall $(PROJECT_NAME) --namespace ${KUBERNETES_NAMESPACE}
@@ -92,6 +97,7 @@ helm-remove:
 
 ## api-docs: Generate OpenAPI3 Spec
 api-docs:
+	@go install github.com/swaggo/swag/cmd/swag@latest
 	swag init -g cmd/api/main.go
 	curl -X POST "https://converter.swagger.io/api/convert" \
 		-H "accept: application/json" \
