@@ -2,11 +2,16 @@ package healthcheck
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 	"net/http"
+	"titanic-api/pkgs/response"
 )
 
-type HeathHandler struct{}
+type HealthHandler struct{}
+
+type Status struct {
+	Code  int    `json:"code"`
+	State string `json:"state"`
+}
 
 // Package 	godoc
 // @Summary Get health check status
@@ -14,17 +19,20 @@ type HeathHandler struct{}
 // @Tags    health
 // @ID 		healthcheck
 // @Produce json
-// @Success 200
+// @Success 200 {object} Status
 // @Router  /health [get]
-func (h *HeathHandler) RegisterHandler() *chi.Mux {
+func (h *HealthHandler) RegisterHandler() *chi.Mux {
 	router := chi.NewRouter()
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		render.NoContent(w, r)
+		status := &Status{
+			Code:  http.StatusOK,
+			State: "OK",
+		}
+		response.SendBody(r, w, http.StatusOK, status)
 	})
 	return router
 }
 
-func NewHandler() *HeathHandler {
-	return &HeathHandler{}
+func NewHandler() *HealthHandler {
+	return &HealthHandler{}
 }

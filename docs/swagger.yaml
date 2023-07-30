@@ -1,10 +1,10 @@
 basePath: /api/v1
 definitions:
-  errors.Error:
+  healthcheck.Status:
     properties:
       code:
         type: integer
-      message:
+      state:
         type: string
     type: object
   histogram.Entry:
@@ -48,6 +48,13 @@ definitions:
       ticket:
         type: string
     type: object
+  response.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
 info:
   contact:
     name: Eli Bracha
@@ -64,6 +71,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/healthcheck.Status'
       summary: Get health check status
       tags:
       - health
@@ -82,6 +91,8 @@ paths:
             type: array
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
       summary: Get passengers
       tags:
       - passenger
@@ -112,9 +123,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.Error'
+            $ref: '#/definitions/response.Error'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
       summary: Get passenger
       tags:
       - passenger
@@ -131,6 +144,8 @@ paths:
             $ref: '#/definitions/histogram.Histogram'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error'
       summary: Get fare histogram histogram
       tags:
       - passenger

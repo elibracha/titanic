@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"titanic-api/pkgs/errors"
+	"titanic-api/pkgs/response"
 )
 
 const (
@@ -54,7 +54,7 @@ func (h *Handler) RegisterHandler() *chi.Mux {
 // @ID 		passenger-get-all
 // @Produce json
 // @Success 200 {object} []Response
-// @Failure 500
+// @Failure 500 {object} response.Error
 // @Router  /passenger [get]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	passengers, err := h.service.GetAll()
@@ -64,11 +64,11 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 		for _, p := range passengers {
 			rs = append(rs, h.convertPassenger(p))
 		}
-		errors.SendBody(r, w, http.StatusOK, rs)
+		response.SendBody(r, w, http.StatusOK, rs)
 	default:
 		log.Println(fmt.Sprintf("request id: %s failed to get passengers: %v",
 			middleware.GetReqID(r.Context()), err.Error()))
-		errors.SendError(r, w, http.StatusInternalServerError, errors.ErrInternalFailure.Error())
+		response.SendError(r, w, http.StatusInternalServerError, response.ErrInternalFailure.Error())
 	}
 }
 
@@ -81,40 +81,40 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Param id path int true "Passenger ID"
 // @Param attributes query []string false "Allowed: id, age, sex, name, survived, class, siblings-spouses, parents-children, ticket, fare, cabin, embarked"
 // @Success 200 {object} Response
-// @Failure 404 {object} errors.Error
-// @Failure 500
+// @Failure 404 {object} response.Error
+// @Failure 500 {object} response.Error
 // @Router  /passenger/{id} [get]
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	attr := r.URL.Query().Get("attributes")
 	if err := h.validateAttributes(attr); err != nil {
-		errors.SendError(r, w, http.StatusBadRequest, err.Error())
+		response.SendError(r, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	pid, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		errors.SendError(r, w, http.StatusBadRequest, ErrInvalidID.Error())
+		response.SendError(r, w, http.StatusBadRequest, ErrInvalidID.Error())
 		return
 	}
 
 	storePassenger, err := h.service.Get(pid)
 	switch {
 	case err == ErrPassengerNotFound:
-		errors.SendError(r, w, http.StatusNotFound, ErrPassengerNotFound.Error())
+		response.SendError(r, w, http.StatusNotFound, ErrPassengerNotFound.Error())
 		return
 	case err != nil:
 		log.Println(fmt.Sprintf("request id: %s failed to get passenger: %v",
 			middleware.GetReqID(r.Context()), err.Error()))
-		errors.SendError(r, w, http.StatusInternalServerError, errors.ErrInternalFailure.Error())
+		response.SendError(r, w, http.StatusInternalServerError, response.ErrInternalFailure.Error())
 		return
 	}
 
 	p := h.convertPassenger(storePassenger)
 	switch len(attr) {
 	case 0:
-		errors.SendBody(r, w, http.StatusOK, p)
+		response.SendBody(r, w, http.StatusOK, p)
 	default:
-		errors.SendBody(r, w, http.StatusOK, h.filterAttributes(p, attr))
+		response.SendBody(r, w, http.StatusOK, h.filterAttributes(p, attr))
 	}
 }
 
@@ -125,17 +125,17 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 // @ID 		passenger-fare-histogram
 // @Produce json
 // @Success 200 {object} histogram.Histogram
-// @Failure 500
+// @Failure 500 {object} response.Error
 // @Router  /passenger/fare/histogram/percentile [get]
 func (h *Handler) FarePercentiles(w http.ResponseWriter, r *http.Request) {
 	histogram, err := h.service.FarePercentileHistogram()
 	switch err {
 	case nil:
-		errors.SendBody(r, w, http.StatusOK, histogram)
+		response.SendBody(r, w, http.StatusOK, histogram)
 	default:
 		log.Println(fmt.Sprintf("request id: %s failed to get fare histogram histogram: %v",
 			middleware.GetReqID(r.Context()), err.Error()))
-		errors.SendError(r, w, http.StatusInternalServerError, errors.ErrInternalFailure.Error())
+		response.SendError(r, w, http.StatusInternalServerError, response.ErrInternalFailure.Error())
 	}
 }
 

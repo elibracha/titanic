@@ -30,7 +30,10 @@ const docTemplate = `{
                 "operationId": "healthcheck",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/healthcheck.Status"
+                        }
                     }
                 }
             }
@@ -57,7 +60,10 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
                     }
                 }
             }
@@ -81,7 +87,10 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
                     }
                 }
             }
@@ -125,24 +134,27 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/errors.Error"
+                            "$ref": "#/definitions/response.Error"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "errors.Error": {
+        "healthcheck.Status": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
-                "message": {
+                "state": {
                     "type": "string"
                 }
             }
@@ -206,6 +218,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "ticket": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
                     "type": "string"
                 }
             }

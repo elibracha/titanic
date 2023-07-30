@@ -14,7 +14,7 @@ run: api-docs
 	go run -mod=vendor ./cmd/api/main.go
 
 ## build: Build the API server binary
-build: api-docs
+build:
 	CGO_ENABLED=0 go build -mod=vendor ${LDFLAGS} -o ${PROJECT_NAME} ./cmd/api/main.go
 
 ## docker-build: Build the API server as a docker image
