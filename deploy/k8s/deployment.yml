@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: titanic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      initContainers:
+        - name: data-population
+          image: titanic-api-store:v1
+          command: [ "/bin/sh", "-c" ]
+          args: [ "cp -r /data/* /data-store" ]
+          volumeMounts:
+            - name: data-store
+              mountPath: /data-store
+      containers:
+        - name: api
+          image: titanic-api:v1
+          envFrom:
+            - configMapRef:
+                name: titanic-api-config
+          ports:
+            - containerPort: 8089
+          volumeMounts:
+            - name: data-store
+              mountPath: /data-store
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8089
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8089
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: data-store
+          emptyDir: { }

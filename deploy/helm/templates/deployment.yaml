@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.config.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      initContainers:
+        - name: {{ .Values.app.name }}-data-population
+          image: {{ .Values.store.image }}
+          command: [ "/bin/sh", "-c" ]
+          args: [ "cp -r /data/* /data-store" ] # copy data to shared volume
+          volumeMounts:
+            - name: {{ .Values.volume.name }}
+              mountPath: {{ .Values.volume.path }}
+
+      containers:
+        - name: {{ .Values.app.name }}
+          image: {{ .Values.app.image }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}
+          ports:
+            - containerPort: {{ .Values.app.port }}
+          volumeMounts:
+            - name: {{ .Values.volume.name }}
+              mountPath: {{ .Values.volume.path }}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.config.healthcheck.uri }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.config.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.config.probes.liveness.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.config.healthcheck.uri }}
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: {{ .Values.config.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.config.probes.readiness.periodSeconds }}
+      volumes:
+        - name: {{ .Values.volume.name }}
+          emptyDir: { }

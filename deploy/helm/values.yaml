@@ -1,0 +1,45 @@
+namespace: titanic
+
+app:
+  port: 8089
+  name: titanic-api
+  image: titanic-api:v1
+
+store:
+  image: titanic-api-store:v1
+
+config:
+  replicas: 1
+  healthcheck:
+    uri: /api/v1/health
+  probes:
+    liveness:
+      initialDelaySeconds: 30
+      periodSeconds: 15
+    readiness:
+      initialDelaySeconds: 15
+      periodSeconds: 10
+
+volume:
+  name: data-store
+  path: /data-store
+
+resources:
+  limits:
+    memory: 256Mi
+    cpu: 200m
+  requests:
+    memory: 128Mi
+    cpu: 100m
+
+data:
+  source:
+    type: "CSV"
+    csv: "/data-store/csv/titanic.csv" # path should start with volume.path value
+    sqlite: "/data-store/sqlite/titanic.db" # path should start with volume.path value
+
+service:
+  type: LoadBalancer
+
+
+

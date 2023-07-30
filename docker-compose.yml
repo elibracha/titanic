@@ -1,0 +1,36 @@
+version: "3.9"
+
+networks:
+  internal:
+
+volumes:
+  data:
+
+services:
+  store:
+    image: ${STORE_IMAGE_NAME}
+    container_name: titanic-api-store
+    command: sh -c "tail -f /dev/null"
+    volumes:
+      - data:/data
+    networks:
+      - internal
+
+  api:
+    image: ${API_IMAGE_NAME}
+    container_name: titanic-api
+    depends_on:
+      - store
+    volumes:
+      - data:/data
+    networks:
+      - internal
+    environment:
+      CSV_STORE_PATH: "/data/csv/titanic.csv"
+      SQLITE_STORE_PATH: "/data/sqlite/titanic.db"
+      API_PORT: ${API_PORT}
+      STORE_TYPE: ${STORE_TYPE}
+    ports:
+      - "${API_PORT}:${API_PORT}"
+
+

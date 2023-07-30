@@ -1,0 +1,126 @@
+basePath: /api/v1
+definitions:
+  histogram.Entry:
+    properties:
+      bin:
+        type: integer
+      count:
+        type: integer
+    type: object
+  histogram.Histogram:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/histogram.Entry'
+        type: array
+    type: object
+  passenger.Response:
+    properties:
+      age:
+        type: string
+      cabin:
+        type: string
+      class:
+        type: integer
+      embarked:
+        type: string
+      fare:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      parents-children:
+        type: integer
+      sex:
+        type: string
+      siblings-spouses:
+        type: integer
+      survived:
+        type: integer
+      ticket:
+        type: string
+    type: object
+info:
+  contact:
+    name: Eli Bracha
+  description: This is API provide multiple functionality endpoints over titanic dataset
+  title: Titanic API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Get health check status
+      operationId: healthcheck
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get health check status
+      tags:
+      - health
+  /passenger:
+    get:
+      description: Get all passengers
+      operationId: passenger-get-all
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/passenger.Response'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: Get passengers
+      tags:
+      - passenger
+  /passenger/{id}:
+    get:
+      description: Get passenger by ID number
+      operationId: passenger-get
+      parameters:
+      - description: Passenger ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Allowed: id, age, sex, name, survived, class, siblings-spouses,
+          parents-children, ticket, fare, cabin, embarked'
+        in: query
+        items:
+          type: string
+        name: attributes
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/passenger.Response'
+        "500":
+          description: Internal Server Error
+      summary: Get passenger
+      tags:
+      - passenger
+  /passenger/fare/histogram/histogram:
+    get:
+      description: Get histogram represention of number of passengers in each precentile
+      operationId: passenger-fare-histogram
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/histogram.Histogram'
+        "500":
+          description: Internal Server Error
+      summary: Get fare histogram histogram
+      tags:
+      - passenger
+swagger: "2.0"

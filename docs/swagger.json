@@ -1,0 +1,190 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is API provide multiple functionality endpoints over titanic dataset",
+        "title": "Titanic API",
+        "contact": {
+            "name": "Eli Bracha"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Get health check status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Get health check status",
+                "operationId": "healthcheck",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/passenger": {
+            "get": {
+                "description": "Get all passengers",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passenger"
+                ],
+                "summary": "Get passengers",
+                "operationId": "passenger-get-all",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/passenger.Response"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/passenger/fare/histogram/histogram": {
+            "get": {
+                "description": "Get histogram represention of number of passengers in each precentile",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passenger"
+                ],
+                "summary": "Get fare histogram histogram",
+                "operationId": "passenger-fare-histogram",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/histogram.Histogram"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/passenger/{id}": {
+            "get": {
+                "description": "Get passenger by ID number",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passenger"
+                ],
+                "summary": "Get passenger",
+                "operationId": "passenger-get",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Passenger ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Allowed: id, age, sex, name, survived, class, siblings-spouses, parents-children, ticket, fare, cabin, embarked",
+                        "name": "attributes",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/passenger.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "histogram.Entry": {
+            "type": "object",
+            "properties": {
+                "bin": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "histogram.Histogram": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/histogram.Entry"
+                    }
+                }
+            }
+        },
+        "passenger.Response": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "string"
+                },
+                "cabin": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "integer"
+                },
+                "embarked": {
+                    "type": "string"
+                },
+                "fare": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parents-children": {
+                    "type": "integer"
+                },
+                "sex": {
+                    "type": "string"
+                },
+                "siblings-spouses": {
+                    "type": "integer"
+                },
+                "survived": {
+                    "type": "integer"
+                },
+                "ticket": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

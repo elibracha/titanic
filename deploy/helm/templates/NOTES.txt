@@ -1,0 +1,6 @@
+1. Get the application URL by running these commands:
+{{- if contains "LoadBalancer" .Values.service.type }}
+  export API_HOST=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.status.loadBalancer.ingress[0].hostname}" services {{ .Release.Name }}-service)
+  export API_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].port}" services {{ .Release.Name }}-service)
+  echo http://$API_HOST:$API_PORT
+{{- end }}

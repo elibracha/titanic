@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+data:
+  CSV_STORE_PATH: {{ .Values.data.source.csv }}
+  SQLITE_STORE_PATH: {{ .Values.data.source.sqlite }}
+  API_PORT: "{{ .Values.app.port }}"
+  STORE_TYPE: {{ .Values.data.source.type}}
