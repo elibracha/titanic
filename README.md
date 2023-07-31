@@ -106,10 +106,6 @@ Run the data store as a Docker container.
 
 Build Docker API image and run it.
 
-### `make docker-stop`
-
-Stop the Docker API container.
-
 ### `make docker-remove`
 
 Remove the Docker images and containers.
