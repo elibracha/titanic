@@ -111,10 +111,10 @@ func (s *server) router() (*chi.Mux, error) {
 func (s *server) initService() (passenger.Service, error) {
 	var store passenger.Store
 	storeType := s.conf.GetStoreType()
-	switch passenger.StoreType(storeType) {
-	case passenger.CSV:
+	switch storeType {
+	case passenger.StoreTypeCSV:
 		store = passenger.NewStoreCSV(s.conf.GetStorePathCSV())
-	case passenger.SQLITE:
+	case passenger.StoreTypeSQLite:
 		store = passenger.NewStoreSQLite(passenger.NewConnector(s.conf.GetStorePathSqlite()))
 	default:
 		return nil, fmt.Errorf("store type provided not supported")

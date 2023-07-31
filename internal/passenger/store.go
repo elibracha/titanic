@@ -3,15 +3,13 @@ package passenger
 import "fmt"
 
 const (
-	CSV    StoreType = "CSV"
-	SQLITE StoreType = "SQLITE"
+	StoreTypeCSV    = "CSV"
+	StoreTypeSQLite = "SQLite"
 )
 
 var (
 	ErrPassengerNotFound = fmt.Errorf("passenger not found")
 )
-
-type StoreType string
 
 type Passenger struct {
 	PassengerId int     `csv:"PassengerId"gorm:"column:id;primary_key"`
