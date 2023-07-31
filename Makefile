@@ -52,21 +52,21 @@ docker-remove:
 	-@docker rmi -f $(DOCKER_API_IMAGE_NAME)
 	-@docker rmi -f $(DOCKER_STORE_IMAGE_NAME)
 
-## docker-compose-start: deploy docker compose containers
+## docker-compose-start: Deploy docker compose containers
 docker-compose-start: docker-build docker-build-store
 	STORE_IMAGE_NAME=${DOCKER_STORE_IMAGE_NAME} \
     API_IMAGE_NAME=${DOCKER_API_IMAGE_NAME} \
     API_PORT=${API_PORT} \
     docker-compose up -d
 
-## docker-compose-remove: remove docker compose containers
+## docker-compose-remove: Remove docker compose containers
 docker-compose-remove:
 	STORE_IMAGE_NAME=${DOCKER_STORE_IMAGE_NAME} \
     API_IMAGE_NAME=${DOCKER_API_IMAGE_NAME} \
     API_PORT=${API_PORT} \
 	docker-compose down
 
-## k8s-deploy: deploy kubernetes resources
+## k8s-deploy: Deploy kubernetes resources
 k8s-deploy: docker-build docker-build-store
 	$(info ---> Deploying Kubernetes Deployment...)
 	-kubectl create namespace ${KUBERNETES_NAMESPACE}
@@ -75,7 +75,7 @@ k8s-deploy: docker-build docker-build-store
 	kubectl apply -f deploy/k8s/service.yml
 
 
-## docker-compose-remove: remove kubernetes resources
+## docker-compose-remove: Remove kubernetes resources
 k8s-remove:
 	$(info ---> Deleting Kubernetes Deployment...)
 	-kubectl delete -f deploy/k8s/deployment.yml
@@ -83,13 +83,13 @@ k8s-remove:
 	-kubectl delete -f deploy/k8s/configmap.yml
 	-kubectl delete namespace ${KUBERNETES_NAMESPACE}
 
-## helm-deploy: deploy kubernetes resources using helm release
+## helm-deploy: Deploy kubernetes resources using helm release
 helm-deploy: docker-build docker-build-store
 	$(info ---> Deploying Helm Chart Release...)
 	-kubectl create namespace ${KUBERNETES_NAMESPACE}
 	helm install $(PROJECT_NAME) deploy/helm/ --namespace ${KUBERNETES_NAMESPACE}
 
-## helm-remove: remove kubernetes resources using helm release
+## helm-remove: Remove kubernetes resources using helm release
 helm-remove:
 	$(info ---> Deleting Helm Chart Release...)
 	-helm uninstall $(PROJECT_NAME) --namespace ${KUBERNETES_NAMESPACE}
@@ -113,7 +113,7 @@ coverage:
 	go test ./... -v -coverprofile coverage.out -covermode count
 	go tool cover -func=coverage.out
 
-## coverage-html: opens html code coverage
+## coverage-html: Opens html code coverage
 coverage-html: coverage
 	go tool cover -html=coverage.out
 
