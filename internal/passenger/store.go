@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	StoreTypeCSV    = "CSV"
-	StoreTypeSQLite = "SQLite"
+	StoreTypeSQLite = "SQLITE"
 )
 
 var (
