@@ -46,23 +46,24 @@ created with the following in sqlite terminal:
 
 ```
 CREATE TABLE passengers (
-PassengerId INTEGER PRIMARY KEY,
-Survived INTEGER,
-Pclass INTEGER,
-Name TEXT,
-Sex TEXT,
-Age REAL,
-SibSp INTEGER,
-Parch INTEGER,
-Ticket TEXT,
-Fare REAL,
-Cabin TEXT,
-Embarked TEXT
+    id INTEGER PRIMARY KEY,
+    survived INTEGER,
+    class INTEGER,
+    name TEXT,
+    sex TEXT,
+    age TEXT,
+    siblings_spouses INTEGER,
+    parents_children INTEGER,
+    ticket TEXT,
+    fare REAL,
+    cabin TEXT,
+    embarked TEXT
 );
 ```
 and then 
 ```
-.import /Users/elibr/GolandProjects/titanic-api/testdata/titanic.csv passengers
+.mode csv
+.import data/csv/titanic.csv passengers
 
 ```
 
