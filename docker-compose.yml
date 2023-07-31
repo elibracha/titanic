@@ -4,7 +4,7 @@ networks:
   internal:
 
 volumes:
-  data:
+  data-store:
 
 services:
   store:
@@ -12,7 +12,7 @@ services:
     container_name: titanic-api-store
     command: sh -c "tail -f /dev/null"
     volumes:
-      - data:/data
+      - data-store:/data
     networks:
       - internal
 
@@ -22,12 +22,12 @@ services:
     depends_on:
       - store
     volumes:
-      - data:/data
+      - data-store:/data-store
     networks:
       - internal
     environment:
-      CSV_STORE_PATH: "/data/csv/titanic.csv"
-      SQLITE_STORE_PATH: "/data/sqlite/titanic.db"
+      CSV_STORE_PATH: "/data-store/csv/titanic.csv"
+      SQLITE_STORE_PATH: "/data-store/sqlite/titanic.db"
       API_PORT: ${API_PORT}
     ports:
       - "${API_PORT}:${API_PORT}"
