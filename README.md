@@ -66,7 +66,14 @@ and then
 
 ```
 
-#### NOTICE: If you want to check both implemetation you can set the store type in config.yaml to `SQLITE/CSV`.
+#### NOTICE: If you want to check both implementation you can set the store type in config.yaml to `SQLITE/CSV`.
+
+## Tests
+
+---
+
+Not all test files are complete however you can find testing examples in API handlers test files for reference
+
 ## Makefile Commands
 
 ---

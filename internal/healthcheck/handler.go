@@ -6,11 +6,17 @@ import (
 	"titanic-api/pkg/response"
 )
 
-type HealthHandler struct{}
+type Handler struct{}
 
 type Status struct {
 	Code  int    `json:"code"`
 	State string `json:"state"`
+}
+
+func (h *Handler) RegisterHandler() *chi.Mux {
+	router := chi.NewRouter()
+	router.Get("/", h.Health)
+	return router
 }
 
 // Package 	godoc
@@ -21,18 +27,14 @@ type Status struct {
 // @Produce json
 // @Success 200 {object} Status
 // @Router  /health [get]
-func (h *HealthHandler) RegisterHandler() *chi.Mux {
-	router := chi.NewRouter()
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		status := &Status{
-			Code:  http.StatusOK,
-			State: "OK",
-		}
-		response.SendBody(r, w, http.StatusOK, status)
-	})
-	return router
+func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
+	status := &Status{
+		Code:  http.StatusOK,
+		State: "OK",
+	}
+	response.SendBody(r, w, http.StatusOK, status)
 }
 
-func NewHandler() *HealthHandler {
-	return &HealthHandler{}
+func NewHandler() *Handler {
+	return &Handler{}
 }

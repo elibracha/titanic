@@ -43,7 +43,7 @@ func (h *Handler) RegisterHandler() *chi.Mux {
 	router := chi.NewRouter()
 	router.Get("/", h.GetAll)
 	router.Get("/{id}", h.Get)
-	router.Get("/fare/histogram/percentile", h.FarePercentiles)
+	router.Get("/fare/histogram/percentile", h.FareHistogram)
 	return router
 }
 
@@ -127,7 +127,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} histogram.Histogram
 // @Failure 500 {object} response.Error
 // @Router  /passenger/fare/histogram/percentile [get]
-func (h *Handler) FarePercentiles(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) FareHistogram(w http.ResponseWriter, r *http.Request) {
 	histogram, err := h.service.FarePercentileHistogram()
 	switch err {
 	case nil:

@@ -475,3 +475,4 @@ MigrationBackup/
 
 # End of https://www.toptal.com/developers/gitignore/api/go,intellij+iml,vs
 /.idea/sonarlint/
+/.idea/inspectionProfiles/Project_Default.xml

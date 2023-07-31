@@ -44,7 +44,7 @@ docker-run-store:
 docker-start: docker-build docker-run
 
 ## docker-remove: Removes the docker images and containers for API and data store
-docker-remove: docker-stop
+docker-remove:
 	-@docker stop $(DOCKER_API_IMAGE_NAME)
 	-@docker stop $(DOCKER_STORE_IMAGE_NAME)
 	-@docker rm -f $(DOCKER_API_IMAGE_NAME)
@@ -114,7 +114,7 @@ coverage:
 	go tool cover -func=coverage.out
 
 ## coverage-html: opens html code coverage
-coverage-html:
+coverage-html: coverage
 	go tool cover -html=coverage.out
 
 .PHONY: help
