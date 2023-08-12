@@ -140,14 +140,14 @@ func (h *Handler) FareHistogram(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) validateAttributes(attr string) error {
-	if len(attr) == 0 {
+	switch {
+	case len(attr) == 0:
 		return nil
+	case len(attr) > maxAttributeParamLength:
+		return fmt.Errorf("attributes query parameter is too long max length %d", maxAttributeParamLength)
 	}
 
 	attributes := strings.Split(attr, ",")
-	if len(attributes) > maxAttributeParamLength {
-		return fmt.Errorf("attributes query parameter is too long max length %d", maxAttributeParamLength)
-	}
 
 	for i, a := range attributes {
 		attributes[i] = strings.TrimSpace(a)
