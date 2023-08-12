@@ -43,7 +43,7 @@ func NewConfig() *Config {
 	var config Config
 	portStr, err := getEnv("API_PORT")
 	if err != nil {
-		log.Fatal("environment variable not set API_PORT")
+		log.Fatal(err)
 	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -52,11 +52,11 @@ func NewConfig() *Config {
 
 	storePathCSV, err := getEnv("CSV_STORE_PATH")
 	if err != nil {
-		log.Fatal("environment variable not set CSV_STORE_PATH")
+		log.Fatal(err)
 	}
 	storePathSqlite, err := getEnv("SQLITE_STORE_PATH")
 	if err != nil {
-		log.Fatal("environment variable not set SQLITE_STORE_PATH")
+		log.Fatal(err)
 	}
 
 	viper.SetConfigName("config")

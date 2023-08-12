@@ -34,7 +34,6 @@ resources:
 
 data:
   source:
-    type: "CSV"
     csv: "/data-store/csv/titanic.csv" # path should start with volume.path value
     sqlite: "/data-store/sqlite/titanic.db" # path should start with volume.path value
 
