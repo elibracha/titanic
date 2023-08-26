@@ -1,4 +1,4 @@
-FROM golang:1.20 as builder
+FROM golang:1.21 as builder
 LABEL stage=builder
 WORKDIR /usr/src/app
 
@@ -6,7 +6,7 @@ COPY . .
 RUN make test && make build
 
 
-FROM golang:1.20
+FROM golang:1.21
 WORKDIR /app/
 
 ARG port
