@@ -1,0 +1,54 @@
+<table class="text-sm text-left text-gray-500">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+            <th scope="col" class="px-6 py-3">
+                Name
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Age
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Survived
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Gender
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Cabin
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Fare
+            </th>
+            <th scope="col" class="px-6 py-3">
+                Ticket 
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Passengers }}
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                {{ .Name }}
+            </th>
+            <td class="px-6 py-4">
+                {{ .Age }}
+            </td>
+            <td class="px-6 py-4">
+                {{ .Survived }}
+            </td>
+            <td class="px-6 py-4">
+                {{ .Sex }}
+            </td>
+            <td class="px-6 py-4">
+                {{ .Cabin }}
+            </td>
+            <td class="px-6 py-4">
+                {{ .Fare }}
+            </td>
+            <td class="px-6 py-4">
+                {{ .Ticket }}
+            </td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>

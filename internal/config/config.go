@@ -10,8 +10,7 @@ import (
 
 type Config struct {
 	storeType       string
-	storePathCSV    string
-	storePathSQLite string
+	storePath	string
 	port            int
 }
 
@@ -19,19 +18,15 @@ func (c *Config) GetStoreType() string {
 	return c.storeType
 }
 
-func (c *Config) GetStorePathCSV() string {
-	return c.storePathCSV
-}
-
-func (c *Config) GetStorePathSqlite() string {
-	return c.storePathSQLite
+func (c *Config) GetStorePath() string {
+	return c.storePath 
 }
 
 func (c *Config) GetPort() int {
 	return c.port
 }
 
-func getEnv(key string) (string, error) {
+func (c *Config) getEnv(key string) (string, error) {
 	value, exists := os.LookupEnv(key)
 	if !exists {
 		return "", fmt.Errorf("enviorment variable is not set %s", key)
@@ -41,22 +36,13 @@ func getEnv(key string) (string, error) {
 
 func NewConfig() *Config {
 	var config Config
-	portStr, err := getEnv("API_PORT")
+	portStr, err := config.getEnv("API_PORT")
 	if err != nil {
 		log.Fatal(err)
 	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		log.Fatal("invalid port number provided in API_PORT")
-	}
-
-	storePathCSV, err := getEnv("CSV_STORE_PATH")
-	if err != nil {
-		log.Fatal(err)
-	}
-	storePathSqlite, err := getEnv("SQLITE_STORE_PATH")
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	viper.SetConfigName("config")
@@ -70,10 +56,23 @@ func NewConfig() *Config {
 
 	storeType := viper.GetString("api.store.type")
 
+	var storePath string
+	switch storeType {
+	case "CSV":
+		storePath, err = config.getEnv("CSV_STORE_PATH")
+		if err != nil {
+			log.Fatal(err)
+		}
+	case "SQLITE":
+		storePath, err = config.getEnv("SQLITE_STORE_PATH")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	config.port = port
 	config.storeType = storeType
-	config.storePathCSV = storePathCSV
-	config.storePathSQLite = storePathSqlite
+	config.storePath = storePath
 
 	return &config
 }

@@ -7,7 +7,7 @@ DOCKER_API_IMAGE_NAME := "$(PROJECT_NAME):v1"
 DOCKER_STORE_IMAGE_NAME := "$(PROJECT_NAME)-store:v1"
 
 ## run: Run the API server alone in normal mode
-run: api-docs
+run:
 	CSV_STORE_PATH=${CSV_STORE_PATH} \
 	SQLITE_STORE_PATH=${SQLITE_STORE_PATH} \
 	API_PORT=${API_PORT} \

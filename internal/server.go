@@ -3,10 +3,6 @@ package internal
 import (
 	"context"
 	"fmt"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +12,11 @@ import (
 	"titanic-api/internal/config"
 	"titanic-api/internal/healthcheck"
 	"titanic-api/internal/passenger"
+	"titanic-api/internal/web"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Server interface {
@@ -82,8 +83,6 @@ func (s *server) router() (*chi.Mux, error) {
 		cors.Handler(cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET"},
-			AllowedHeaders: []string{"User-Agent", "Content-Type", "Accept", "Accept-Encoding", "Accept-Language",
-				"Cache-Control", "Connection", "DNT", "Host", "Origin", "Pragma", "Referer"},
 			MaxAge: 300,
 		}),
 	)
@@ -97,12 +96,17 @@ func (s *server) router() (*chi.Mux, error) {
 		httpSwagger.URL("/openapi.json"),
 	))
 
+	router.Get("/ui", web.NewHandler(service).Root)
+	router.Get("/ui/passengers", web.NewHandler(service).Passengers)
+	router.Get("/ui/histogram", web.NewHandler(service).Histogram)
+
 	// setup routes
 	router.Route("/api/v1", func(r chi.Router) {
 		// setup passenger routes
 		r.Mount("/passenger", passenger.NewHandler(service).RegisterHandler())
 		// setup health check routes
 		r.Mount("/health", healthcheck.NewHandler().RegisterHandler())
+		// setup UI 
 	})
 
 	return router, nil
@@ -113,9 +117,9 @@ func (s *server) initService() (passenger.Service, error) {
 	storeType := s.conf.GetStoreType()
 	switch storeType {
 	case passenger.StoreTypeCSV:
-		store = passenger.NewStoreCSV(s.conf.GetStorePathCSV())
+		store = passenger.NewStoreCSV(s.conf.GetStorePath())
 	case passenger.StoreTypeSQLite:
-		store = passenger.NewStoreSQLite(passenger.NewConnector(s.conf.GetStorePathSqlite()))
+		store = passenger.NewStoreSQLite(passenger.NewConnector(s.conf.GetStorePath()))
 	default:
 		return nil, fmt.Errorf("store type provided not supported")
 	}
