@@ -21,6 +21,7 @@ COPY --from=builder /usr/src/app/app .
 COPY --from=builder /usr/src/app/config.yaml config.yaml
 COPY --from=builder /usr/src/app/docs ./docs
 COPY --from=builder /usr/src/app/data ./data
+COPY --from=builder /usr/src/app/templates ./templates
 
 EXPOSE $port
 ENTRYPOINT ["./app"]
