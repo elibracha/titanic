@@ -4,6 +4,7 @@ import (
     "html/template"
     "log"
     "net/http"
+    "strconv"
     "titanic-api/internal/passenger"
     "titanic-api/pkg/histogram"
 
@@ -24,6 +25,7 @@ func (h *Handler) RegisterHandler() *chi.Mux {
     router := chi.NewRouter()
     router.Get("/", h.Root)
     router.Get("/passengers", h.Passengers)
+    router.Get("/passenger/{id}", h.Passenger)
     router.Get("/histogram", h.Histogram)
     return router
 }
@@ -37,6 +39,27 @@ func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
 
     tmpl.Execute(w, nil)
 }
+
+func (h *Handler) Passenger(w http.ResponseWriter, r *http.Request) {
+    tmpl, err := template.ParseFiles("templates/passengers.html")
+    if err != nil {
+        log.Println(err.Error())
+    }
+
+    var data Data
+    pid, err := strconv.Atoi(chi.URLParam(r, "id"))
+    if err != nil {
+        return
+    }
+
+    p, err := h.service.Get(pid)
+    if err == nil {
+        data.Passengers = []*passenger.Passenger{p}
+    }
+
+    tmpl.Execute(w, data)
+}
+
 
 func (h *Handler) Passengers(w http.ResponseWriter, r *http.Request) {
     tmpl, err := template.ParseFiles("templates/passengers.html")
