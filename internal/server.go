@@ -87,6 +87,11 @@ func (s *server) router() (*chi.Mux, error) {
 		}),
 	)
 
+	// setup ui routes
+	router.Route("/ui", func(r chi.Router) {
+		r.Mount("/", web.NewHandler(service).RegisterHandler())
+	})
+
 	// setup static docs route
 	fs := http.FileServer(http.Dir("docs"))
 	router.Mount("/", http.StripPrefix("/", fs))
@@ -96,12 +101,7 @@ func (s *server) router() (*chi.Mux, error) {
 		httpSwagger.URL("/openapi.json"),
 	))
 
-	// setup ui routes
-	router.Route("/ui", func(r chi.Router) {
-		r.Mount("/", web.NewHandler(service).RegisterHandler())
-	})
-
-	// setup API routes
+	// setup api routes
 	router.Route("/api/v1", func(r chi.Router) {
 		// setup passenger routes
 		r.Mount("/passenger", passenger.NewHandler(service).RegisterHandler())
