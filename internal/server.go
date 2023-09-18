@@ -96,11 +96,12 @@ func (s *server) router() (*chi.Mux, error) {
 		httpSwagger.URL("/openapi.json"),
 	))
 
-	router.Get("/ui", web.NewHandler(service).Root)
-	router.Get("/ui/passengers", web.NewHandler(service).Passengers)
-	router.Get("/ui/histogram", web.NewHandler(service).Histogram)
+	// setup ui routes
+	router.Route("/ui", func(r chi.Router) {
+		r.Mount("/", web.NewHandler(service).RegisterHandler())
+	})
 
-	// setup routes
+	// setup API routes
 	router.Route("/api/v1", func(r chi.Router) {
 		// setup passenger routes
 		r.Mount("/passenger", passenger.NewHandler(service).RegisterHandler())

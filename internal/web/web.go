@@ -1,11 +1,13 @@
 package web
 
 import (
-	"html/template"
-	"log"
-	"net/http"
-	"titanic-api/internal/passenger"
-	"titanic-api/pkg/histogram"
+    "html/template"
+    "log"
+    "net/http"
+    "titanic-api/internal/passenger"
+    "titanic-api/pkg/histogram"
+
+    "github.com/go-chi/chi"
 )
 
 type Data struct {
@@ -17,6 +19,15 @@ type Data struct {
 type Handler struct {
     service passenger.Service
 }
+
+func (h *Handler) RegisterHandler() *chi.Mux {
+    router := chi.NewRouter()
+    router.Get("/", h.Root)
+    router.Get("/passengers", h.Passengers)
+    router.Get("/histogram", h.Histogram)
+    return router
+}
+
 
 func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
     tmpl, err := template.ParseFiles("public/layout.html")
@@ -38,7 +49,7 @@ func (h *Handler) Passengers(w http.ResponseWriter, r *http.Request) {
     if err == nil {
         data.Passengers = p
     }
-    
+
     tmpl.Execute(w, data)
 }
 
@@ -47,13 +58,13 @@ func (h *Handler) Histogram(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Println(err.Error())
     }
-    
+
     var data Data
     pc, err := h.service.FarePercentileHistogram()
     if err == nil {
         data.Histogram = pc.Entries
     }
-    
+
 
     tmpl.Execute(w, data)
 }
