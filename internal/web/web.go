@@ -30,7 +30,7 @@ func (h *Handler) RegisterHandler() *chi.Mux {
 
 
 func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
-    tmpl, err := template.ParseFiles("public/layout.html")
+    tmpl, err := template.ParseFiles("templates/layout.html")
     if err != nil {
         log.Println(err.Error())
     }
@@ -39,7 +39,7 @@ func (h *Handler) Root(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Passengers(w http.ResponseWriter, r *http.Request) {
-    tmpl, err := template.ParseFiles("public/passengers.html")
+    tmpl, err := template.ParseFiles("templates/passengers.html")
     if err != nil {
         log.Println(err.Error())
     }
@@ -54,7 +54,7 @@ func (h *Handler) Passengers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Histogram(w http.ResponseWriter, r *http.Request) {
-    tmpl, err := template.ParseFiles("public/histogram.html")
+    tmpl, err := template.ParseFiles("templates/histogram.html")
     if err != nil {
         log.Println(err.Error())
     }
