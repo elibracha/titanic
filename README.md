@@ -28,7 +28,7 @@ If you are using the Makefile environment variables will be loaded from `.env`.
 Project structure follows unofficial standard however simple one for API layout - https://github.com/golang-standards/project-layout
 
 #### project uses vendor folder while building the binary to not download dependencies in runtime
-## OpenAPI Docs/ Custom UI
+## OpenAPI Docs / Custom UI
 
 ---
 Once you run the API you can access the OpenAPI UI in `/api/docs/` or `/api/docs/index.html`.
