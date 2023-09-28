@@ -3,6 +3,10 @@ package internal
 import (
 	"context"
 	"fmt"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
 	"os"
@@ -13,10 +17,6 @@ import (
 	"titanic-api/internal/healthcheck"
 	"titanic-api/internal/passenger"
 	"titanic-api/internal/web"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Server interface {
@@ -83,7 +83,7 @@ func (s *server) router() (*chi.Mux, error) {
 		cors.Handler(cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET"},
-			MaxAge: 300,
+			MaxAge:         300,
 		}),
 	)
 
@@ -107,7 +107,6 @@ func (s *server) router() (*chi.Mux, error) {
 		r.Mount("/passenger", passenger.NewHandler(service).RegisterHandler())
 		// setup health check routes
 		r.Mount("/health", healthcheck.NewHandler().RegisterHandler())
-		// setup UI 
 	})
 
 	return router, nil
