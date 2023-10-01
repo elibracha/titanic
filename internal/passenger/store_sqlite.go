@@ -1,6 +1,7 @@
 package passenger
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
 )
@@ -17,7 +18,7 @@ func (s *sqliteStore) GetPassenger(pid int) (*Passenger, error) {
 
 	var passenger Passenger
 	if err = db.Where("id = ?", pid).First(&passenger).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrPassengerNotFound
 		}
 		return nil, err
