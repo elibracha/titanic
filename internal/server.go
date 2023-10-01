@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -33,16 +34,16 @@ func (s *server) Start() {
 		log.Fatalf("setup error: %s", err)
 	}
 
-	port := fmt.Sprintf(":%d", s.conf.GetPort())
+	p := fmt.Sprintf(":%d", s.conf.GetPort())
 	srv := &http.Server{
-		Addr:    port,
+		Addr:    p,
 		Handler: router,
 	}
 
 	// start server
 	go func() {
-		log.Printf("Starting server on %s...", port)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Printf("Starting server on %s...", p)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("server setup error: %s", err)
 		}
 	}()
